@@ -34,19 +34,22 @@ function Newblog() {
         <div>
              <Headers/>
              <br/><br/>
-             <div class Name="container">
+             <div className="container">
              
              <TextField  style={{ marginLeft:30}}required id="standard-required" onChange={(e) => setname(e.target.value)} label="Heading" defaultValue="" />
+             <br/>
+             <TextField  style={{ marginLeft:30}}  onChange={(e) => setname(e.target.value)} label="Name" defaultValue="" />
              <br/> <br/> 
-             <Form>
-    <TextArea onChange={(e) => setmessage(e.target.value)} placeholder='Share any experience about this website' style={{ minHeight: 250,width:300 ,marginLeft:20}} />
+             <Form >
+    <TextArea onChange={(e) => setmessage(e.target.value)} placeholder='Share any experience about this website' className="textarea-styl"  />
   </Form>
-             </div>
+             
              <br/>
              <Button variant="contained"  onClick={sendblog} color="primary" href="#contained-buttons" style={{ marginLeft:140}}>
         Publish
       </Button>
              <br/><br/><br/><br/><br/><br/><br/>
+             </div>
   <Footer/>
         </div>
     )
