@@ -7,6 +7,7 @@ import { Form, TextArea } from 'semantic-ui-react'
 import socketIOClient from "socket.io-client";
 
 function Newblog() {
+    const [topic, settopic] = useState("Topic By a Stranger");
     const [name, setname] = useState("Someone");
     const [messsage, setmessage] = useState("");
    
@@ -14,12 +15,12 @@ function Newblog() {
     async function sendblog(){
   
   if( messsage!=""){
-   //// const ENDPOINT = "http://localhost:5000";
+  //// const ENDPOINT = "http://localhost:5000";
   
-    const ENDPOINT = "https://helostranger.com/";
+ const ENDPOINT = "https://helostranger.com/";
    
           const    socket = socketIOClient(ENDPOINT);
-          socket.emit('shareblog', {'name' : name,'message':messsage});
+          socket.emit('shareblog', {'topic' : topic,'name' : name,'message':messsage});
   
            alert("your content will be public after admin approval!! Thanks Please share more");
 
@@ -36,9 +37,9 @@ function Newblog() {
              <br/><br/>
              <div className="container">
              
-             <TextField  style={{ marginLeft:30}}required id="standard-required" onChange={(e) => setname(e.target.value)} label="Heading" defaultValue="" />
+             <TextField  style={{ marginLeft:30}}required id="standard-required" onChange={(e) => settopic(e.target.value)} label="Topic Title" defaultValue="" />
              <br/>
-             <TextField  style={{ marginLeft:30}}  onChange={(e) => setname(e.target.value)} label="Name" defaultValue="" />
+             <TextField  style={{ marginLeft:30}}  onChange={(e) => setname(e.target.value)} label=" Your Name" defaultValue="" />
              <br/> <br/> 
              <Form >
     <TextArea onChange={(e) => setmessage(e.target.value)} placeholder='Share any experience about this website' className="textarea-styl"  />

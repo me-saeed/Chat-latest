@@ -12,8 +12,8 @@ function Blog() {
 
 
     useEffect(() => {
-      const ENDPOINT = "https://helostranger.com/";
-    //// const ENDPOINT = "http://localhost:5000";
+   const ENDPOINT = "https://helostranger.com/";
+  ////  const ENDPOINT = "http://localhost:5000";
      
         /////const ENDPOINT =    "https://helostranger.com/myapi";
      
@@ -91,12 +91,12 @@ function Blog() {
     <a  class="card">
      
       <article>
-    <h1>{s.name}</h1>
+    <h1>{s.topic}</h1>
         <div className="description-styl">{s.message} 
         
         
          </div> 
-        <span>{s.name}</span>
+        <span>By:{s.name}</span>
       </article>
     </a>
   </div>

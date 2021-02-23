@@ -7,6 +7,7 @@ import FaqsPage from './pages/faqs';
 import SupportPage from './pages/support';
 import IndexPage from './pages';
 import Chat from './pages/Chat';
+import Admin from './pages/Admin';
 
 import Blog from './pages/Blog';
 import Newblog from './pages/Newblog';
@@ -36,7 +37,8 @@ class App extends Component {
           <Route exact path="/blogs" component={Blog} />
           <Route exact path="/newblog" component={Newblog} />
           {/* <Route exact path="/chat" component={Chat} /> */}
-          <Route exact path="/" component={Chat} />
+          <Route exact path="/chat" component={Chat} />
+          <Route exact path="/admin" component={Admin} />
         </Switch>
       </Router>
     );
