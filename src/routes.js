@@ -11,6 +11,8 @@ import Admin from './pages/Admin';
 
 import Blog from './pages/Blog';
 import Newblog from './pages/Newblog';
+import Calling from './pages/Calling';
+import Dispatcher from './pages/Dispatcher';
 
 
 
@@ -39,6 +41,9 @@ class App extends Component {
           {/* <Route exact path="/chat" component={Chat} /> */}
           <Route exact path="/chat" component={Chat} />
           <Route exact path="/admin" component={Admin} />
+
+          <Route exact path="/calling" component={Calling} />
+          <Route exact path="/dispatcher" component={Dispatcher} />
         </Switch>
       </Router>
     );
