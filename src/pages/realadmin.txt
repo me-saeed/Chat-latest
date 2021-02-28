@@ -179,7 +179,7 @@ function  Admin() {
     const socket = useRef();
   
     useEffect(() => {
-      socket.current = io.connect("https://www.helostranger.com")
+      socket.current = io.connect("localhost:5000",{query:'loggeduser=admin'})
       navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then(stream => {
         setStream(stream);
         if (userVideo.current) {
@@ -211,21 +211,7 @@ function  Admin() {
       const peer = new Peer({
         initiator: true,
         trickle: false,
-        config: {
-  
-          iceServers: [
-              {
-                  urls: "stun:numb.viagenie.ca",
-                  username: "sultan1640@gmail.com",
-                  credential: "98376683"
-              },
-              {
-                  urls: "turn:numb.viagenie.ca",
-                  username: "sultan1640@gmail.com",
-                  credential: "98376683"
-              }
-          ]
-      },
+        config:         {"iceServers": [{"url": "stun:stun.l.google.com:19302"}]},
         stream: stream,
       });
   
@@ -256,24 +242,10 @@ function  Admin() {
       setCallAccepted(true);
       const peer = new Peer({
         initiator: false,
-        config: {
-  
-          iceServers: [
-              {
-                  "urls":["stun.l.google.com:19302",
-                    "stun1.l.google.com:19302",
-                    "stun2.l.google.com:19302",
-                    "stun3.l.google.com:19302",
-                    "stun4.l.google.com:19302",]
-                  
-              },
-              
-          ]
-      },
         trickle: false,
         stream: stream,
       });
-      peer.on("signal", data => {
+      peer.on("open", data => {
         socket.current.emit("acceptCall", { signal: data, to: caller })
       })
   

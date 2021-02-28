@@ -13,7 +13,8 @@ import Blog from './pages/Blog';
 import Newblog from './pages/Newblog';
 import Calling from './pages/Calling';
 import Dispatcher from './pages/Dispatcher';
-
+import Caller from './pages/Caller';
+import Reciever from './pages/Reciever';
 
 
 class App extends Component {
@@ -44,6 +45,10 @@ class App extends Component {
 
           <Route exact path="/calling" component={Calling} />
           <Route exact path="/dispatcher" component={Dispatcher} />
+          <Route exact path="/caller" component={Caller} />
+
+          <Route exact path="/reciever" component={Reciever} />
+
         </Switch>
       </Router>
     );
