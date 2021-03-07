@@ -17,6 +17,9 @@ import Caller from './pages/Caller';
 import Reciever from './pages/Reciever';
 
 
+import Vechile from './pages/Vechile';
+
+
 class App extends Component {
 
 
@@ -48,6 +51,7 @@ class App extends Component {
           <Route exact path="/caller" component={Caller} />
 
           <Route exact path="/reciever" component={Reciever} />
+          <Route exact path="/vechile" component={Vechile} />
 
         </Switch>
       </Router>

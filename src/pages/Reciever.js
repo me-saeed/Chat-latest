@@ -33,6 +33,7 @@ const useStyles = makeStyles((theme) => ({
       },
   }));
 function Reciever() {
+  
     const classes = useStyles();
   const theme = useTheme();
   const [yourID, setYourID] = useState("");
@@ -41,10 +42,12 @@ function Reciever() {
 
 
 
-  const [status, setstatus] = useState("Ringing");
+  const [status, setstatus] = useState("");
 
 
   const [dispatvherID, setdispatvherID] = useState("");
+
+  const [allrecentusers, setallrecentusers] = useState([]);
 
   const [users, setUsers] = useState({});
   const [stream, setStream] = useState();
@@ -59,14 +62,173 @@ function Reciever() {
   const userVideo = useRef();
   const partnerVideo = useRef();
   const socket = useRef();
+  const peerServer = useRef();
+
+
+
+
+
+function readytoacceptcall(){
+  socket.current = io.connect("http://localhost:5000",{query:'loggeduser=user'})
+
+  peerServer.current=new Peer({
+    config: {
+      iceServers: [
+        {
+        urls: [
+        "stun:65.1.136.15:3478",
+        ],
+        },
+        {
+        username: "user",
+        credential: "password",
+        urls: [
+        "turn:65.1.136.15:3478?transport=udp",
+        "turn:65.1.136.15:3478?transport=tcp",
+        "turns:65.1.136.15:5349?transport=tcp",
+        ],
+        },
+        ]
+  },
+              host:'localhost',
+  
+             /// host:'helostranger.com',
+              /// host:'192.168.1.104',
+                 secure:false,
+                 port:5000,
+                 path:"/mypeer",
+                 
+             })
+             
+      const roomID="admin";
+  
+  
+  
+  peerServer.current.on('open',(userId)=>{
+    ////  alert("dd")
+      socket.current.emit('join-room',{userId,roomID})
+  
+  });
+  
+  
+
+  socket.current.on('allrecentusers',(allrecentusers)=>{
+
+    setallrecentusers(allrecentusers);
+  })
+
+  
+  // peerServer.current.on('close', function () {
+  //   //// conn = null;
+  //    ////alert('Connection destroyed');
+  //   //// peerServer.current.destroy();
+
+  //    readytoacceptcall()
+  // });
+  peerServer.current.on('call',(call)=>{
+  
+      navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then(stream => {
+          setStream(stream);
+          if (userVideo.current) {
+            userVideo.current.srcObject = stream;
+  
+          }
+  
+
+
+
+
+
+
+          socket.current.on('cancelbyadmin',(message)=>{
+
+         /////   alert("it called")
+           
+       
+           setstatus("");
+      
+          //// peerServer.current.destroy();
+           call.close();
+      
+         /// readytoacceptcall()
+          //// window.location="/reciever"
+         
+         })
+
+
+
+          
+          confirmAlert({
+              title: 'Confirm to submit',
+              message: 'Are you sure to do this.',
+              buttons: [
+                {
+                  label: 'Yes',
+                  onClick: () => {
+                      call.answer(stream)
+  
+    setstatus("In Call")
+     
+                      call.on("stream",(patner)=>{
+                         
+                          if (partnerVideo.current) {
+                              partnerVideo.current.srcObject = patner;
+                            }
+                        ///  alert(stream)
+                        
+                  
+                          
+                      })
+  
+                  }
+                },
+                {
+                  label: 'No',
+                  onClick: () => {
+                    cancelcall();
+  
+  
+                  }
+                }
+              ]
+            });
+  
+  
+         
+      
+          
+        //   if (userVideo.current) {
+        //     userVideo.current.srcObject = stream;
+        //   }
+        })
+  
+     
+  });
+  
+  
+  
+}
 
 
   useEffect(() => {
       
-   
-
-    socket.current = io.connect("https://helostranger.com",{query:'loggeduser=user'})
     
+
+    ////socket.current = io.connect("https://helostranger.com",{query:'loggeduser=user'})
+
+   
+    
+    
+    
+    // socket.current.on('disconnect', function(data) { // handle server/connection falling
+    //   console.log('Connection fell or your browser is closing.');
+    // });
+
+
+    readytoacceptcall()
+
+    
+
     // socket.current.on('user-connected',(userId)=>{ 
 
 
@@ -75,159 +237,87 @@ function Reciever() {
     //       //  peerServer.call(userId,stream)
     //     })
 
-const peerServer=new Peer({
-  config: {
-  
-    iceServers: [
-        {
-            urls:[
-              "stun.l.google.com:19302",
-              "stun1.l.google.com:19302",
-              "stun2.l.google.com:19302",
-              "stun3.l.google.com:19302",
-              "stun4.l.google.com:19302",
-            ]
-            
-        },
-        
-    ]
-},
-           //// host:'localhost',
-
-            host:'helostranger.com',
-            /// host:'192.168.1.104',
-               secure:true,
-             ////  port:5000,
-               path:"/mypeer",
-               
-           })
-           
-    const roomID="admin";
-
-
-
-peerServer.on('open',(userId)=>{
-  ////  alert("dd")
-    socket.current.emit('join-room',{userId,roomID})
-
-});
-
-
-
-
-peerServer.on('call',(call)=>{
-
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
-        setStream(stream);
-
-        
-        confirmAlert({
-            title: 'Confirm to submit',
-            message: 'Are you sure to do this.',
-            buttons: [
-              {
-                label: 'Yes',
-                onClick: () => {
-                    call.answer(stream)
-
-  
-   
-                    call.on("stream",(patner)=>{
-                       
-                        if (partnerVideo.current) {
-                            partnerVideo.current.srcObject = patner;
-                          }
-                      ///  alert(stream)
-                      
-                
-                        
-                    })
-
-                }
-              },
-              {
-                label: 'No',
-                onClick: () => alert('Click No')
-              }
-            ]
-          });
-
-
-       
-    
-        
-      //   if (userVideo.current) {
-      //     userVideo.current.srcObject = stream;
-      //   }
-      })
-
-   
-});
-
-
-
 
 	  }, []);
 
 
       function acceptit(){
-alert("accept it")
+///alert("accept it")
         setCallAccepted(true)
       }
 
 
-      function joinroom(){
-        
-        const peerServer=new Peer(undefined,{
-            host:'localhost',
-            /// host:'192.168.1.104',
-               secure:false,
-               port:5000,
-               path:"/mypeer"
-           })
-           
-    const roomID="itsrandom------";
+      function cancelcall(){
+        ////  peerServer.current.disconnect()
+  
+          socket.current.emit('calcelbycaller');
+         
+          setstatus("");
+          // peerServer.current.on('close'=>{
+           ////// peerServer.disconnect();
+            
+           //// peerServer.current.destroy()
+          // })
+        //   peerServer.current.on('close', function () {
+        //    //// conn = null;
+        //     console.log('Connection destroyed');
+        // });
+          
+        }
 
-
-
-peerServer.on('open',(userId)=>{
-  ////  alert("dd")
-    socket.current.emit('join-room',{userId,roomID})
-
-});
-
-
-
-
-peerServer.on('call',(call)=>{
-    alert("call recieved")
-    call.answer(stream)
-    // call.on("stream",(stream)=>{
-       
-    //     if (partnerVideo.current) {
-    //         partnerVideo.current.srcObject = stream;
-    //       }
-    //   ///  alert(stream)
+      
+      let UserVideo;
+     
+        UserVideo = (
+          <video playsInline muted ref={userVideo} autoPlay />
+        );
+      
+    
+      let PartnerVideo;
+     
+        PartnerVideo = (
+          <video playsInline ref={partnerVideo} autoPlay />
+        );
       
 
-
-    // })
-});
-          
-      }
 
     return (
       <div>
 
 reciever
+<br></br>
+
+
+{allrecentusers.map((s,i)=>
+
+<>
+{s.username}
+<br></br>
+{s.long}
+<br></br>
+{s.lat}
+<br></br>
+{s.datetime}
+<br></br>
+--------------------------------------------------------
+</>
+
+)}
+
+
+
 {/* <button onClick={joinroom}>join room</button> */}
 
-<video playsInline muted ref={partnerVideo} autoPlay />
+{PartnerVideo}
 
-
+<video playsInline muted ref={userVideo} autoPlay />
 
 {iscall==true? <>
     <button onClick={()=>acceptit()}>accept call</button>
+</>:null}
+
+{status=="In Call"? <>
+<button onClick={cancelcall}>cancel call</button>
 </>:null}
 
 

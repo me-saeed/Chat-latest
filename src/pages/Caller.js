@@ -41,7 +41,7 @@ function Calling() {
 
 
 
-  const [status, setstatus] = useState("Ringing");
+  const [status, setstatus] = useState("");
 
 
   const [dispatvherID, setdispatvherID] = useState("");
@@ -56,29 +56,33 @@ function Calling() {
   const userVideo = useRef();
   const partnerVideo = useRef();
   const socket = useRef();
+  const peerServer = useRef();
 
   
   useEffect(() => {
       
    
 
-    socket.current = io.connect("https://helostranger.com",{query:'loggeduser=user'})
+   //// socket.current = io.connect("https://helostranger.com",{query:'loggeduser=user'})
+
+
+    socket.current = io.connect("http://localhost:5000",{query:'loggeduser=user'})
+
+    socket.current.on('disconnect', function(data) { // handle server/connection falling
+      console.log('Connection fell or your browser is closing.');
+    });
     socket.current.on("allUsers", (users) => {
         setUsers(users);
       })
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
-      setStream(stream);
-      if (userVideo.current) {
-        userVideo.current.srcObject = stream;
-      }
-    })
+   
     
+
 
 	  }, []);
       function joinroom(){
         
 //         const peerServer=new Peer(undefined,{
-//             host:'localhost',
+//             host:'localhost',y
 //             /// host:'192.168.1.104',
 //                secure:false,
 //                port:5000,
@@ -125,38 +129,54 @@ function Calling() {
           
       }
 
+      function cancelcall(){
+  
+        socket.current.emit('calcelbycaller');
+       
+        setstatus("");
+      
+      }
+
 
       function callpeer(){
        
 
 
+        navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then(stream => {
+          setstatus("Ringing")
+          setStream(stream);
+          if (userVideo.current) {
+            userVideo.current.srcObject = stream;
 
-
-    
-        const peerServer=new Peer({
+          }
+              
+         peerServer.current=new Peer({
           config: {
   
             iceServers: [
-                {
-                    urls:[
-                      "stun.l.google.com:19302",
-                      "stun1.l.google.com:19302",
-                      "stun2.l.google.com:19302",
-                      "stun3.l.google.com:19302",
-                      "stun4.l.google.com:19302",
-                    ]
-                    
-                },
-                
-            ]
+              {
+              urls: [
+              "stun:65.1.136.15:3478",
+              ],
+              },
+              {
+              username: "user",
+              credential: "password",
+              urls: [
+              "turn:65.1.136.15:3478?transport=udp",
+              "turn:65.1.136.15:3478?transport=tcp",
+              "turns:65.1.136.15:5349?transport=tcp",
+              ],
+              },
+              ]
         },
-           // host:'localhost',
-           host:'helostranger.com',
+            host:'localhost',
+         ////  host:'helostranger.com',
 
             /// host:'192.168.1.104',
-               secure:true,
-             ////  port:5000,
-               path:"/mypeer",
+               secure:false,
+              port:5000,
+               path:"/",
                
            })
            
@@ -164,72 +184,95 @@ function Calling() {
 
 
 
-peerServer.on('open',(userId)=>{
-  ////  alert("dd")
+peerServer.current.on('open',(userId)=>{
+  
    /// socket.current.emit('join-room',{userId,roomID})
+   var uniqueid="abcd"
 
-    socket.current.emit('callfromcaller',{userId});
+   var username="saeed"
+   var lat="111";
+   var long="565"
+   socket.current.emit('callfromcaller',{userId,lat,long,uniqueid,username})
 
 });
 
+peerServer.current.on('close', function () {
+  //// conn = null;
+   ////alert('Connection destroyed');
+   peerServer.current.destroy();
+
+   ////readytoacceptcall()
+});
 
 socket.current.on('someproblem',(message)=>{
     alert(message)
 
  })
+
+ socket.current.on('cancelbyadmin',(message)=>{
+  //// alert("cancel now")
+  peerServer.current.destroy()
+  setstatus("");
+
+})
 socket.current.on('user-connected',(userId)=>{ 
     ////alert(userId)
     
 
-    const call = peerServer.call(userId, stream);
+    const call = peerServer.current.call(userId, stream);
     call.on('stream', (remoteStream) => {
+      setstatus("In Call")
         if (partnerVideo.current) {
                       partnerVideo.current.srcObject = remoteStream;
                        }
     });
       
-    //   const callme = peerServer.call(userId,stream)
-    //   callme.on('stream', (remoteStream) => {
-    //       alert(remoteStream)
-    //     if (partnerVideo.current) {
-    //         partnerVideo.current.srcObject = remoteStream;
-    //       }
-      
-    //   });
+   
     })
 
-// peerServer.on('call',(call)=>{
-//     call.answer(stream)
-//     call.on("stream",(stream)=>{
-       
 
-//         if (partnerVideo.current) {
-//             partnerVideo.current.srcObject = stream;
-//           }
+        })
+
       
-
-
-//     })
-// });
-    
 
 
 
 
       }
+      let UserVideo;
+     
+      UserVideo = (
+        <video playsInline muted ref={userVideo} autoPlay />
+      );
+    
+  
+    let PartnerVideo;
+   
+      PartnerVideo = (
+        <video playsInline ref={partnerVideo} autoPlay />
+      );
+    
 
     return (
       <div>
 
+
+
+status:{status}
+
+<br></br>
+
+{status==""? <>
 caller
 <button onClick={callpeer}>call now</button>
+</>:null}
 
+{status=="In Call"? <>
+<button onClick={cancelcall}>cancel call</button>
+</>:null}
 
+{PartnerVideo}
 
-
-
-
-<video playsInline muted ref={partnerVideo} autoPlay />
         </div>
     )
 }

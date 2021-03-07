@@ -188,11 +188,9 @@ var dispatcherid='';
 io.on('connection', socket => {
  
 
-  if(socket.handshake.query.loggeduser=="admin"){
-   if (!users[socket.id]) {
-      users[socket.id] = socket.id;
-  }
-
+  if(socket.handshake.query.loggeduser=="vehcile"){
+   console.log("got vehcile")
+   console.log(socket.handshake.query.id)
    }
 // else{
 //   dispatcherid= socket.id;
