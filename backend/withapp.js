@@ -5,6 +5,11 @@ const  morgan = require("morgan");
 const register = require("./route/register/register");
 
 const signinuser = require("./route/signin/sigininuser");
+
+
+const admin = require("./route/admin/admin");
+
+
 const  cors = require("cors");
 
 const app = require('express')()
@@ -58,6 +63,8 @@ app.use("/", peerServer)
 register(app);
 
 signinuser(app);
+
+admin(app);
 app.use(express.static(path.join(__dirname, 'build')));
 
 app.use('*', (req, res) => {
@@ -152,9 +159,10 @@ adminuserid=userId
 
     socket.join(roomname)
 
-
+    if(adminrealsocket!=""){
     adminrealsocket.emit('allactivevechile',allavailablevechile);
   adminrealsocket.emit('allrecentusers',allrecentusers);
+    }
 }
 
 
@@ -189,9 +197,10 @@ if (roomname!=''){
         username:username
 
       }
+      if(adminrealsocket!=""){
       adminrealsocket.emit('upcomingcall',meobj);
 
-
+      }
 
 
       usersocket=socket;
@@ -214,8 +223,9 @@ var myobj={
  
 allrecentusers.push(myobj)
 console.log(allrecentusers)
+if(adminrealsocket!=""){
 adminrealsocket.emit('allrecentusers',allrecentusers);
-
+}
         }
         else{
             socket.emit('someproblem','Dispatcher is busy on some other call or may not avaialble.Please try it later')
@@ -246,11 +256,15 @@ socket.on('calcelbycaller', function () {
     let namespace = null;
 // let ns = _io.of(namespace || "/");
 // let socket = ns.connected[usersocket]
+if(usersocket!=''){
 usersocket.emit('cancelbyadmin','rejected')
+}
+if(adminrealsocket!=''){
 adminrealsocket.emit('cancelbyadmin','rejected')
-
+}
+if(usersocket!=''){
 usersocket.leave(roomname);
-
+}
    
     
 });
@@ -357,9 +371,9 @@ allavailablevechile[indexofvechile].userlong=userlong;
 
 allworkingvechile.push(allavailablevechile[indexofvechile])
 
-
+if(adminrealsocket!=""){
 adminrealsocket.emit('allworkingvechile',allworkingvechile);
-
+}
 allavailablevechile.splice(indexofvechile, 1);
 console.log(allworkingvechile);
 console.log("avalialvle")
@@ -380,10 +394,10 @@ console.log(vechileid)
 
 socket.on('trackingresults',(data)=>{
 
-
+  if(adminrealsocket!=""){
   adminrealsocket.emit('trackingresults',(data));
 
-
+  }
 
 })
 
